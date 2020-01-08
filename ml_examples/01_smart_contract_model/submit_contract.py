@@ -81,14 +81,18 @@ def train_and_evaluate(api, contract, entity, data_string, label_string):
     # train on the input data
     fet_tx_fee = api.tokens.balance(entity)
     api.sync(contract.action(api, 'train', fet_tx_fee, [entity], data_string, label_string))
+    print("train balance: " + str(api.tokens.balance(entity)))
 
     # evaluate the initial loss
     initial_loss = contract.query(api, 'evaluate')
+    print("evaluate balance: " + str(api.tokens.balance(entity)))
     print("initial_loss: " + initial_loss)
 
 
 def main(source, mode, benefactor, options):
     api, contract, entity1, entity2 = contract_setup(source, benefactor, options)
+
+    print("initial balance: " + str(api.tokens.balance(entity1)))
 
     # load training data
     train_data_string, train_label_string = load_data(mode)
@@ -102,6 +106,8 @@ def main(source, mode, benefactor, options):
     prediction = contract.query(api, 'predict', data_string=train_data_string)
     print("model training prediction: " + prediction)
 
+    print("post predict balance: " + str(api.tokens.balance(entity1)))
+
     # load different set of data
     test_data_string, test_label_string = load_data(mode, False)
     print("test data: " + test_data_string)
@@ -111,6 +117,8 @@ def main(source, mode, benefactor, options):
     fet_tx_fee = 160000
     api.sync(contract.action(api, 'setDataAndLabel', fet_tx_fee, [entity2], test_data_string, test_label_string))
 
+    print("post set data and label balance: " + str(api.tokens.balance(entity1)))
+
     # entity 1 grabs the latest data for inspection
     # we don't need to do this - but we just demonstrate how here
     retrieved_test_data_string = contract.query(api, 'getData')
@@ -118,9 +126,13 @@ def main(source, mode, benefactor, options):
     print("some new data: " + retrieved_test_data_string)
     print("some new label: " + retrieved_test_label_string)
 
+    print("post get data and label balance: " + str(api.tokens.balance(entity1)))
+
     # entity 1 makes a prediction on the new (test) data
     prediction = contract.query(api, 'predict', data_string=retrieved_test_data_string)
     print("model test prediction: " + prediction)
+
+    print("post predict balance: " + str(api.tokens.balance(entity1)))
 
 
 # run function for running on end to end tests

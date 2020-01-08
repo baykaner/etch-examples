@@ -112,6 +112,8 @@ function train(data_string: String, label_string: String)
   var batch_size = 10u64;
   model.fit(data, label, batch_size);
   model_state.set(model);
+  // model_state.set(model);
+  // model_state.set(model);
 endfunction
 
 // make a prediction with the model based on input data passed to function
